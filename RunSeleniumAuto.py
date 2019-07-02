@@ -1,10 +1,18 @@
-#RunSeleniumAuto.py
+#Name:RunSeleniumAuto.py
+#Description: This program is a part of the wrapper program that drives Selenium/Java Automation
+#by Augmentum. This program launches the wrapper program and evaluates user inputs. encapsulates 
+#methods and data structures required by the wrapper.
+#Initial Developer: N.V. Anil Kumar
+#Company: Stratus Technologies, MA,USA
+#Date : 2-July-2019
+#===============================================================================================
 
 import getopt, os, sys
 from SeleniumAuto import *
 #
 #=====================================Variable Declarations==============================================================================
 global SAObj
+global SecHeading
 #========================================================================================================================================
 def EvaluateArgs():
     try:
@@ -24,6 +32,7 @@ def EvaluateArgs():
             Sec_given=True
             print('Section heading under which Java commands live is %s ' % a )
             SAObj.Set_Section_Heading(a)
+            global SecHeading
             SecHeading=a
             
         elif o in ("-s", "--server"):
@@ -54,8 +63,16 @@ def Usage():
     print("%s --file Config_File --name Section_Heading --server Target_Server"  % sys.argv[0])
     print("\nConfig_File is the Configuration File. Section_Heading is the name or label of the section that contains data.")
     print("Target_Server is the host on which tests are going to be executed.")
-    print("\nConfig file , Target Server host name and Section Heading name (both must be as is in the config file) are mandatory options.") 
+    print("\nConfig file , Target Server host name and Section Heading name (both must be as is in the config file) are mandatory options.")
+    print("\nIf the Galaxy string is supplied as an argument for -n parameter then the program runs in Batch processing mode.")
+    print("\nIt runs all the sections given under Galaxy section heading in the config file.")
    
+#========================================================================================================================================
+def Process_SectionHeading(SecHeading):
+    SAObj.Set_Section_Heading(SecHeading)
+    SAObj.Set_Config_Dict()
+    SAObj.ExecuteCommands()
+    
 #========================================================================================================================================
 
 if __name__ == "__main__":
@@ -65,10 +82,10 @@ if __name__ == "__main__":
     print(sys.argv)
     
     SAObj.Set_Host_Config_Dict()
-   
-    SAObj.Set_Config_Dict()
-    #SAObj.Set_Contact_IpAddr(SAObj.CONFIG['IPAddr'])
     SAObj.Set_TLO_Object()
-    #SAObj.GetTCEResult('C:\PyHeaven\RunSeleAuto\ev1111.out')
-    SAObj.ExecuteCommands()
     
+    if SecHeading=='Galaxy':
+        SAObj.Set_Batch_Config_Dict()
+        SAObj.Process_SH_Batch(SecHeading)
+    elif SecHeading!='Galaxy':
+        SAObj.Process_SectionHeading(SecHeading)

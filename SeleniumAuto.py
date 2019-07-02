@@ -1,13 +1,17 @@
-#SeleniumAuto Class.
+#Name:SeleniumAuto Class.
+#Description: This class is a part of the wrapper program that drives Selenium/Java Automation
+#by Augmentum. This file encapsulates methods and data structures required by the wrapper.
+#Initial Developer: N.V. Anil Kumar
+#Company: Stratus Technologies, MA,USA
+#Date : 2-July-2019
+#===============================================================================================
 
 import getopt, os, sys, fileinput, time, pprint
-#import paramiko
 import logging
 from socket import gethostname
 from TestLinkOps import *
 
 #---------------------------------------------
-#import SSHOps
 import CommonLibrary as CL
 
 class SeleniumAuto():
@@ -54,9 +58,11 @@ class SeleniumAuto():
         print('\nContents of CONFIG dictionary : ')
         pprint.pprint(self.CONFIG)
         
-    # def Set_Contact_IpAddr(self):
-        # self.CONTACT_IPADDR = self.HOST_CONFIG['IPAddr']
-        # print('\nCONTACT_IPADDR is now set to %s ' %  self.CONTACT_IPADDR)
+    def Set_Batch_Config_Dict(self):
+        self.BATCH_CONFIG=CL.GetDFSec2Dict(self.CONFIG_FILE, self.SECTION_HEADING)
+        print('\nBATCH_CONFIG dictionary is now loaded with keys and values from CONFIG file...')
+        print('\nContents of BATCH_CONFIG dictionary : ')
+        pprint.pprint(self.BATCH_CONFIG)
 
     def Set_Contact_IpAddr(self, IPAddr=None):
         self.CONTACT_IPADDR = IPAddr
@@ -95,10 +101,13 @@ class SeleniumAuto():
         pprint.pprint(TC_Info)
                         
     def ExecuteCommands(self):
+        Target_Log_Dir=self.CONFIG['EXEC_LOG_DIR'] if self.CONFIG.get('EXEC_LOG_DIR') else CL.CWD
         Ordered_List=self.CONFIG['EXEC_ORDER'].split(',')
+        #
         for TC in Ordered_List:
-            TestOut=TC+".out"
-            TestErr=TC+".err"
+            print("\nTest Case %s --- Commencing Execution" % TC)
+            TestOut=CL.Create_DestDir_Join_Filename(Target_Log_Dir,TC+".out")
+            TestErr=CL.Create_DestDir_Join_Filename(Target_Log_Dir,TC+".err")
             Ofile= open(TestOut,"w+")
             Efile= open(TestErr,"w+")
             print('Executing the following command line of the test case %s : ' % TC)
@@ -107,6 +116,26 @@ class SeleniumAuto():
             Ofile.close()
             Efile.close()
             TCEResult=self.GetTCEResult(TestOut)
-            self.UpdateTestLink(TC,TCEResult)
-
+            if TCEResult:            
+                self.UpdateTestLink(TC,TCEResult)
+            elif not TCEResult:
+                print("Test Case execution status seems to be invalid! Skipping TestLink updation for this test case : %s " % TC)
+            print("\nTest Case %s --- End of Execution" % TC)    
+            print("\n=========================================================================================================================\n")
+    
+    def Process_SectionHeading(self, SecHeading):
+        print("Processing Section heading : %s " % SecHeading)
+        self.Set_Section_Heading(SecHeading)
+        self.Set_Config_Dict()
+        self.ExecuteCommands()
+        
+    def Process_SH_Batch(self, SecHeading):
+        print("Execution in Batch Processing Mode.")
+        print("Processing one by one all the section headings found under section of sections : %s " % SecHeading)
+        Ordered_List=self.BATCH_CONFIG['EXEC_ORDER'].split(',')
+        #
+        for key in Ordered_List:
+            SH=self.BATCH_CONFIG[key]
+            self.Process_SectionHeading(SH)
+        
             

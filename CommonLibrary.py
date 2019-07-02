@@ -1,3 +1,4 @@
+#Common Library file.
 import configparser
 from subprocess import *
 from time import sleep
@@ -102,4 +103,23 @@ def Write_Lines_To_File(FileName, List_of_Lines):
             print(Line)
             print(Line,file=f)
         print("Done.")
+        
+def Create_DestDir_Join_Filename(DirName,FileName):
+    AssertNotEmpty(DirName)
+    AssertNotEmpty(FileName)
+    
+    if not os.path.isdir(DirName):
+        print("Directory %s does not exists! Creating the required directory path..." % DirName)
+        try:  
+            os.makedirs(DirName)
+        except OSError:  
+            print("Creation of the directory %s failed" % DirName)
+        else:  
+            print("Successfully created the directory %s" % DirName)
+    #
+    Full_File_Name = os.path.join(DirName, FileName)
+    print("Absolute path of the requested file is %s " % Full_File_Name)
+    return Full_File_Name
+    
+    
         

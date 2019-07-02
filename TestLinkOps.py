@@ -1,4 +1,11 @@
-#TestLinkOps.py
+#Name:TestLinkOps.py
+#Description: This class is a part of the wrapper program that drives Selenium/Java Automation
+#by Augmentum. This class encapsulates all the data structures and methods required by the wrapper program
+#that takes care of updating test results directly on TestLink application.
+#Initial Developer: N.V. Anil Kumar
+#Company: Stratus Technologies, MA,USA
+#Date : 2-July-2019
+#===============================================================================================
 from __future__ import print_function
 import testlink
 from testlink import TestlinkAPIClient, TestLinkHelper, TestGenReporter
@@ -41,13 +48,3 @@ class TestLinkOps :
         print(TCData)
         TC_Info=self.TLO.reportTCResult(testplanid=TestPlanID, status=TCEResult, testcaseexternalid=TestCaseID, buildname=BuildName, notes=TestNotes, user=TesterName, platformid=PlatformID)
         return TC_Info               
-
-# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-#Personal API Access Key = 3e8d34447eabe0773ee11c32f2d7e652
-
-# tls = testlink.TestLinkHelper().connect(testlink.TestlinkAPIClient)
-# tls.countProjects()
-
-# tc_info = tls.getTestCase(None, testcaseexternalid='eE-2815')
